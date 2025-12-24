@@ -2,65 +2,75 @@ require 'httparty'
 require 'nokogiri'
 require 'csv'
 
-# 1. Configuración
-url = 'https://arstechnica.com/ai/'
+# --- CONFIGURACIÓN ---
+url_portada = 'https://arstechnica.com/ai/'
 headers = {
-  "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 }
 
-puts "📡 Conectando a #{url}..."
-response = HTTParty.get(url, headers: headers)
+puts "📡 Conectando a la portada: #{url_portada}..."
+response = HTTParty.get(url_portada, headers: headers)
 
 if response.code == 200
   doc = Nokogiri::HTML(response.body)
-
-  # 2. Selección de artículos basada en tu HTML
-  # Buscamos todas las etiquetas <article> que estén dentro del layout
   articulos = doc.css('article')
 
-  puts "🔍 Se encontraron #{articulos.count} artículos en la portada."
+  puts "🔍 Se encontraron #{articulos.count} noticias. Comenzando extracción profunda..."
 
-  if articulos.empty?
-    puts "⚠️ No se encontraron artículos. Es posible que la estructura interna haya cambiado drásticamente."
-    exit
-  end
+  CSV.open('noticias_completas_ars.csv', 'wb') do |csv|
+    # Encabezados del CSV
+    csv << ['Titulo', 'Link', 'Contenido Completo']
 
-  # 3. Guardado en CSV
-  CSV.open("datos_arstechnica.csv", "wb") do |csv|
-    csv << ["Titulo", "Link", "Contenido"]
+    articulos.each_with_index do |articulo, index|
+      # 1. Obtener datos básicos de la portada
+      nodo_titulo = articulo.at_css('h2 a') || articulo.at_css('header a')
 
-    articulos.each do |articulo|
-      # --- Lógica de Extracción ---
+      next unless nodo_titulo # Si no hay título, saltamos
 
-      # TÍTULO Y LINK: Generalmente están dentro de un <h2> que contiene un <a>
-      nodo_titulo = articulo.at_css('h2 a') 
+      titulo = nodo_titulo.text.strip
+      link = nodo_titulo['href']
 
-      # Si no encuentra h2, intentamos buscar el primer enlace <a> dentro del header del artículo
-      nodo_titulo = articulo.at_css('header a') unless nodo_titulo
+      puts "\n[#{index + 1}/#{articulos.count}] Procesando: #{titulo[0..30]}..."
+      puts '   ↳ Accediendo al link...'
 
-      # CONTENIDO: Buscamos el párrafo <p> que sirve de extracto (excerpt).
-      # En el nuevo diseño suele ser un <p class="excerpt"> o simplemente el primer <p> que no sea meta-data.
-      nodo_contenido = articulo.at_css('div.excerpt') || articulo.at_css('p.excerpt') || articulo.at_css('p')
+      # 2. ENTRAR A LA NOTICIA (Segunda Petición)
+      begin
+        response_detalle = HTTParty.get(link, headers: headers)
 
-      # --- Limpieza y Guardado ---
-      if nodo_titulo
-        titulo = nodo_titulo.text.strip
-        link = nodo_titulo['href']
+        if response_detalle.code == 200
+          doc_detalle = Nokogiri::HTML(response_detalle.body)
 
-        # Validamos el contenido. Si no hay resumen, ponemos "Sin resumen"
-        contenido = nodo_contenido ? nodo_contenido.text.strip : "Sin resumen disponible"
+          # 3. EXTRAER CONTENIDO COMPLETO
+          # Ars Technica pone el texto en divs con clase 'post-content' o 'article-content'
+          # Buscamos todos los párrafos <p> dentro de esas clases.
+          nodos_texto = doc_detalle.css('.post-content p, .article-content p, div[itemprop="articleBody"] p')
 
-        # Escribimos en el CSV
-        csv << [titulo, link, contenido]
-        puts "   📝 Procesado: #{titulo[0..40]}..."
-      else
-        puts "   ⚠️ Se saltó un bloque <article> porque no se detectó título."
+          # Unimos todos los párrafos con un salto de línea, limpiando espacios
+          contenido_completo = nodos_texto.map { |p| p.text.strip }.reject(&:empty?).join("\n\n")
+
+          # Si por alguna razón no encuentra texto (ej: es un video), ponemos un aviso
+          contenido_completo = 'No se pudo extraer el texto o es contenido multimedia.' if contenido_completo.empty?
+
+          # 4. GUARDAR EN CSV
+          csv << [titulo, link, contenido_completo]
+          puts "   ✅ Contenido extraído (#{contenido_completo.length} caracteres)."
+
+        else
+          puts "   ❌ Error al entrar al link (Código #{response_detalle.code})"
+          csv << [titulo, link, 'Error de acceso']
+        end
+      rescue StandardError => e
+        puts "   ❌ Error de conexión: #{e.message}"
+        csv << [titulo, link, "Error: #{e.message}"]
       end
+
+      # 5. PAUSA DE CORTESÍA (Evita bloqueos)
+      sleep 1
     end
   end
 
-  puts "\n🎉 ¡Listo! Revisa el archivo 'datos_arstechnica.csv'."
+  puts "\n🎉 ¡Misión cumplida! Revisa el archivo 'noticias_completas_ars.csv'."
 
 else
-  puts "❌ Error al conectar: Código #{response.code}"
+  puts "❌ Error al conectar con la portada: Código #{response.code}"
 end
