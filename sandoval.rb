@@ -25,7 +25,7 @@ class Scraper
         pages = gets.chomp.to_i
         pages = ((pages > 0) and (pages < 4)) ? pages : 1
 
-        filename = '/data/sandoval.csv'
+        filename = 'data/sandoval.csv'
 
         gen_csv(filename)
         save_csv(filename, ["Title", "Link", "Content"])
