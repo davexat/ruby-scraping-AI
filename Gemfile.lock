@@ -1,0 +1,25 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    csv (3.3.5)
+    fiddle (1.1.8)
+    nokogiri (1.18.9-x64-mingw-ucrt)
+      racc (~> 1.4)
+    racc (1.8.1)
+
+PLATFORMS
+  x64-mingw-ucrt
+
+DEPENDENCIES
+  csv
+  fiddle
+  nokogiri (= 1.18.9)
+
+CHECKSUMS
+  csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
+  fiddle (1.1.8) sha256=7fa8ee3627271497f3add5503acdbc3f40b32f610fc1cf49634f083ef3f32eee
+  nokogiri (1.18.9-x64-mingw-ucrt) sha256=6b4fc1523aa0370c78653e38c94cb50e7f3ab786425de66ba7ad24222c1164a3
+  racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
+
+BUNDLED WITH
+  4.0.2
