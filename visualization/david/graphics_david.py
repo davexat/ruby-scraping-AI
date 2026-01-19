@@ -78,6 +78,7 @@ sns.barplot(x='Percentage', y='Company', hue='Company', data=df_1)
 plt.title('% de Titulares que mencionan empresas líderes')
 plt.xlabel('% de Titulares')
 plt.ylabel('Empresa')
+plt.savefig(os.path.join(script_dir, 'question1.png'))
 plt.show()
 
 # PREGUNTA 2
@@ -323,6 +324,7 @@ plt.ylabel('Número de Noticias', fontsize=12)
 plt.xlabel('Nivel de Especialización', fontsize=12)
 plt.xticks([0, 1, 2], ["Divulgativos", "Conceptuales", "Técnicos"])
 ax.legend().remove()
+plt.savefig(os.path.join(script_dir, 'question2.png'))
 plt.show()
 
 # PREGUNTA 3
@@ -405,4 +407,5 @@ plt.title('Categorías de Noticias')
 plt.xlabel('% de Noticias')
 plt.ylabel('Categoría')
 plt.yticks(['Generative AI & LLMs', 'Computer Vision', 'Machine Learning & Data Science', 'Robotics & Automation', 'Autonomous Vehicles', 'Ethics, Safety & Regulation', 'Hardware & Infrastructure', 'Healthcare & Biotech', 'Enterprise & Business Applications'], ['IA Generativa', 'Visión por Computadora', 'ML & Datos', 'Robótica', 'Vehículos Autónomos', 'Ética y Regulación', 'Hardware', 'Salud & Biotecnología', 'IA Empresarial'])
+plt.savefig(os.path.join(script_dir, 'question3.png'))
 plt.show()
