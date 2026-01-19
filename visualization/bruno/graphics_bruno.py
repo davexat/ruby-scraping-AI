@@ -2,8 +2,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
+import os
 
-archivo = '../../data/romero.csv' 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+archivo = os.path.join(script_dir, '../../data/romero.csv')
+
 print(f"Cargando datos desde: {archivo}")
 
 try:
@@ -23,8 +26,8 @@ def limpiar_numero(valor):
 df['Puntos'] = df['Puntos'].apply(limpiar_numero)
 df['Comentarios'] = df['Comentarios'].apply(limpiar_numero)
 
-sns.set_style("whitegrid")
-plt.rcParams.update({'font.size': 11})
+sns.set_theme(style="whitegrid")
+plt.rcParams['figure.figsize'] = (10, 6)
 
 # ==============================================================================
 # GRÁFICO 1: PIE CHART
@@ -35,13 +38,11 @@ conteo = df['Relevancia'].value_counts()
 colores = {'ALTA (IA)': '#ff6b6b', 'General Tech': '#4ecdc4'}
 
 plt.pie(conteo, labels=conteo.index, autopct='%1.1f%%', 
-        startangle=140, colors=[colores.get(x, '#999999') for x in conteo.index],
-        explode=(0.05, 0), shadow=True, textprops={'fontsize': 14, 'weight': 'bold'})
+        startangle=140, colors=[colores.get(x, '#999999') for x in conteo.index], textprops={'fontsize': 14, 'weight': 'bold'})
 
 plt.title('Distribución de Noticias: IA vs Tecnología General', fontsize=16, fontweight='bold')
 plt.tight_layout()
-plt.savefig('question1.png')
-#print("Gráfico 1 generado")
+plt.savefig(os.path.join(script_dir, 'question1.png'))
 
 # ==============================================================================
 # GRÁFICO 2: BARRAS DE IMPACTO PROMEDIO
@@ -53,22 +54,22 @@ promedios = df.groupby('Relevancia')[['Puntos', 'Comentarios']].mean().reset_ind
 
 df_melted = promedios.melt(id_vars='Relevancia', var_name='Métrica', value_name='Promedio')
 
-sns.barplot(data=df_melted, x='Relevancia', y='Promedio', hue='Métrica', 
-            palette={'Puntos': '#FFD700', 'Comentarios': '#1E90FF'})
+ax = sns.barplot(data=df_melted, x='Relevancia', y='Promedio', hue='Métrica', 
+            palette='magma')
 
-plt.title('Comparativa de Impacto Promedio: Aprobación vs. Debate', fontsize=15, fontweight='bold')
+plt.title('Comparativa de Impacto Promedio: Aprobación vs. Debate', fontsize=16, fontweight='bold')
 plt.ylabel('Cantidad Promedio', fontsize=12)
 plt.xlabel('')
 
-for p in plt.gca().patches:
-    plt.gca().annotate(f'{int(p.get_height())}', 
-                       (p.get_x() + p.get_width() / 2., p.get_height()), 
-                       ha = 'center', va = 'center', xytext = (0, 10), 
-                       textcoords = 'offset points', fontweight='bold')
+ax.legend().remove()
+
+# Agregar valores en las barras
+for container in ax.containers:
+    tmp_hue = df_melted.loc[df_melted['Métrica']==container.get_label()]
+    ax.bar_label(container, labels=tmp_hue['Promedio'])
 
 plt.tight_layout()
-plt.savefig('question2.png')
-#print("Gráfico 2 generado")
+plt.savefig(os.path.join(script_dir, 'question2.png'))
 
 # ==============================================================================
 # GRÁFICO 3: TOP FUENTES DE IA
@@ -80,12 +81,11 @@ df_ia = df[df['Relevancia'] == 'ALTA (IA)'].copy()
 
 top_fuentes = df_ia['Sitio'].value_counts().head(7)
 
-sns.barplot(x=top_fuentes.values, y=top_fuentes.index, palette='magma')
+sns.barplot(x=top_fuentes.values, y=top_fuentes.index, hue=top_fuentes.index, palette='magma')
 
-plt.title('Top 7 Fuentes de Noticias sobre IA', fontsize=15, fontweight='bold')
+plt.title('Top 7 Fuentes de Noticias sobre IA', fontsize=16, fontweight='bold')
 plt.xlabel('Cantidad de Noticias', fontsize=12)
 plt.ylabel('Sitio Web', fontsize=12)
 
 plt.tight_layout()
-plt.savefig('question3.png')
-#print("Gráfico 3 generado")
+plt.savefig(os.path.join(script_dir, 'question3.png'))
