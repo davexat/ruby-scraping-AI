@@ -44,11 +44,11 @@ progamming-languages/
 │
 ├── 📁 visualization/       # Scripts de análisis y visualización
 │   ├── bruno/
-│   │   └── graphics_bruno.py              
-│   ├── david/              
+│   │   └── graphics_bruno.py
+│   ├── david/
 │   │   └── graphics_david.py
-│   └── jaren/              
-│   │   └── graphics_jaren.py    
+│   └── jaren/
+│       └── graphics_jaren.py    
 │
 ├── 📄 Gemfile              # Dependencias Ruby
 ├── 📄 requirements.txt     # Dependencias Python
@@ -86,13 +86,13 @@ Cada scraper extrae datos de una fuente diferente:
 
 ```bash
 # TechCrunch - Noticias de IA
-ruby sandoval.rb
+ruby scr_sandoval.rb
 
 # Ars Technica - Artículos técnicos
-ruby jaren.rb
+ruby scr_pazmino.rb
 
 # Hacker News - Tendencias tech
-ruby romero.rb
+ruby scr_romero.rb
 ```
 
 Los datos se guardarán automáticamente en la carpeta `/data/`.
