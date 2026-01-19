@@ -80,6 +80,7 @@ plt.xlabel('% de Titulares')
 plt.ylabel('Empresa')
 plt.savefig(os.path.join(script_dir, 'question1.png'))
 plt.show()
+plt.clf()
 
 # PREGUNTA 2
 # ¿Cuál es la frecuencia de términos técnicos específicos (LLM, RAG, Agents, GPU y otros) en el texto completo de las noticias para medir el nivel de tecnificación del lenguaje?
@@ -326,6 +327,7 @@ plt.xticks([0, 1, 2], ["Divulgativos", "Conceptuales", "Técnicos"])
 ax.legend().remove()
 plt.savefig(os.path.join(script_dir, 'question2.png'))
 plt.show()
+plt.clf()
 
 # PREGUNTA 3
 # ¿Qué subcategorías de IA (Generativa, Robótica, Ética) predominan en los registros almacenados?
@@ -409,3 +411,4 @@ plt.ylabel('Categoría')
 plt.yticks(['Generative AI & LLMs', 'Computer Vision', 'Machine Learning & Data Science', 'Robotics & Automation', 'Autonomous Vehicles', 'Ethics, Safety & Regulation', 'Hardware & Infrastructure', 'Healthcare & Biotech', 'Enterprise & Business Applications'], ['IA Generativa', 'Visión por Computadora', 'ML & Datos', 'Robótica', 'Vehículos Autónomos', 'Ética y Regulación', 'Hardware', 'Salud & Biotecnología', 'IA Empresarial'])
 plt.savefig(os.path.join(script_dir, 'question3.png'))
 plt.show()
+plt.clf()
