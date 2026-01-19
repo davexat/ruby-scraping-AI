@@ -106,12 +106,12 @@ python graphics_david.py
 
 Los gráficos se generarán como imágenes PNG en el directorio correspondiente.
 
-## 📊 Preguntas que Responde el Análisis
+## 📊 Sub Conjunto de Preguntas que Responde el Análisis
 
 ### 🔍 Pregunta 1: ¿Qué empresas líderes se mencionan más?
 Identifica las empresas tecnológicas más mencionadas en los titulares (OpenAI, Google, Meta, Microsoft, etc.) y calcula el porcentaje de aparición.
 
-![Gráfico tipo barras horizontales mostrando % de titulares por empresa]
+![img](./visualization/david/question1.png)
 
 ### 📚 Pregunta 2: ¿Cuál es el nivel de especialización de las noticias?
 Clasifica las noticias en tres niveles según la complejidad de los términos técnicos utilizados:
@@ -119,7 +119,7 @@ Clasifica las noticias en tres niveles según la complejidad de los términos t�
 - **Conceptuales**: Términos intermedios (AGI, Foundation Models)
 - **Técnicos**: Jerga especializada (LoRA, RLHF, Vector DB)
 
-![Gráfico de barras mostrando distribución por nivel de especialización]
+![img](./visualization/david/question2.png)
 
 ### 🤖 Pregunta 3: ¿Qué categorías de IA son más populares?
 Analiza los temas principales en el contenido completo de las noticias:
@@ -130,7 +130,7 @@ Analiza los temas principales en el contenido completo de las noticias:
 - Autonomous Vehicles
 - Business & Enterprise AI
 
-![Gráfico de barras mostrando frecuencia de categorías de IA]
+![img](./visualization/david/question3.png)
 
 ## 🎯 Metodología
 
@@ -160,17 +160,6 @@ Analiza los temas principales en el contenido completo de las noticias:
 - ✅ **Búsqueda case-insensitive** para máxima precisión
 - ✅ **Rutas dinámicas** con `os.path` para portabilidad
 
-## 📈 Resultados Ejemplo
-
-El análisis procesa **cientos de artículos** y genera métricas como:
-
-```
-Total de noticias analizadas: 247
-Empresas líderes identificadas: 12
-Ratio técnico/divulgativo: 2.34
-Categoría dominante: Generative AI & LLMs (67%)
-```
-
 ## 🤝 Contribuciones
 
 Este proyecto fue desarrollado como parte de un análisis académico sobre tendencias en Inteligencia Artificial. Las contribuciones son bienvenidas mediante:
@@ -186,10 +175,6 @@ Este proyecto fue desarrollado como parte de un análisis académico sobre tende
 - Los scrapers están diseñados para **uso educativo** y respetan las políticas de robots.txt
 - Se recomienda usar delays apropiados entre requests
 - Los datos extraídos son para **análisis estadístico**, no redistribución
-
-## 📜 Licencia
-
-Este proyecto está bajo una licencia educativa. El uso comercial no está permitido sin autorización.
 
 ---
 
