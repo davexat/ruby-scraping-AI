@@ -3,117 +3,406 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-# Configuración visual
 sns.set_theme(style="whitegrid")
 plt.rcParams['figure.figsize'] = (10, 6)
 
-# 1. Cargar el CSV
 script_dir = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.join(script_dir, '../../data/sandoval.csv')
 df = pd.read_csv(csv_path)
 
-# Limpieza: Convertir todo a string y minúsculas para facilitar la búsqueda
-df['Titulo_Lower'] = df['Title'].astype(str).str.lower()
-df['Contenido_Lower'] = df['Content'].astype(str).str.lower()
+df['f_title'] = df['Title'].str.lower()
+df['f_content'] = df['Content'].str.lower()
 
-# Pregunta 1
-# Definimos las empresas a rastrear
-empresas_target = ['openai', 'google', 'meta', 'anthropic', 'microsoft', 'perplexity', 'xai']
+# PREGUNTA 1: 
+# ¿Qué porcentaje de titulares en la sección de IA mencionan empresas líderes (OpenAI, Google, Meta, Anthropic) para identificar el dominio del mercado?
 
-# Diccionario para guardar el conteo
-conteo_empresas = {empresa: 0 for empresa in empresas_target}
-total_noticias = len(df)
+# Para contestar esta pregunta, se considerará una sola categoría unificada de empresas líderes.
+# Es decir, no se considerará si su dominio son modelos, infraestructura, etc.
 
-# Contamos apariciones
-for titulo in df['Titulo_Lower']:
-    for empresa in empresas_target:
-        if empresa in titulo:
-            conteo_empresas[empresa] += 1
+target_companies = [
+    ['OpenAI'],
+    ['Google', 'Alphabet'],
+    ['Anthropic'],
+    ['Meta', 'Facebook', 'Instagram', 'WhatsApp'],
+    ['Microsoft', 'MSFT', 'Azure'],
+    ['xAI', 'Elon Musk', 'Grok'],
+    ['Amazon', 'AWS'],
+    ['Oracle'],
+    ['NVIDIA', 'Nvidia'],
+    ['AMD', 'Advanced Micro Devices'],
+    ['Intel', 'Intel Corp'],
+    ['TSMC', 'Taiwan Semiconductor'],
+    ['Hugging Face'],
+    ['Stability AI'],
+    ['Mistral AI', 'Mistral'],
+    ['Cohere'],
+    ['Apple'],
+    ['Tesla'],
+    ['Perplexity', 'Perplexity AI'],
+    ['IBM', 'IBM WatsonX'],
+    ['Salesforce', 'Slack', 'Einstein GPT'],
+    ['Adobe', 'Adobe Firefly'],
+    ['Snowflake'],
+    ['Palantir'],
+    ['Databricks'],
+    ['Baidu', 'Ernie Bot'],
+    ['Alibaba', 'Qwen'],
+    ['Tencent'],
+    ['Samsung'],
+    ['ASML'],
+    ['Broadcom'],
+    ['Qualcomm'],
+    ['Groq'],
+    ['Scale AI'],
+    ['DeepL']
+]
 
-# Convertimos a porcentajes
-data_empresas = pd.DataFrame(list(conteo_empresas.items()), columns=['Empresa', 'Conteo'])
-data_empresas['Porcentaje'] = (data_empresas['Conteo'] / total_noticias) * 100
-data_empresas = data_empresas.sort_values('Porcentaje', ascending=False)
+companies_count = {companies[0]: 0 for companies in target_companies}
 
-# --- GRÁFICO DE BARRAS (Share of Voice) ---
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(data=data_empresas, x='Porcentaje', y='Empresa', palette='Blues_d')
+for title in df['f_title']:
+    for companies in target_companies:
+        if any(company.lower() in title for company in companies):
+            companies_count[companies[0]] += 1
 
-plt.title('Dominio del Mercado: % de Titulares que Mencionan a Cada Empresa', fontsize=14)
-plt.xlabel('Porcentaje de Aparición (%)', fontsize=12)
-plt.ylabel('Empresa', fontsize=12)
+total_news = len(df)
 
-# Añadir el valor exacto al final de la barra
-for p in ax.patches:
-    width = p.get_width()
-    plt.text(width + 0.5, p.get_y() + p.get_height()/2, f'{width:.1f}%', va='center')
-
-plt.xlim(0, max(data_empresas['Porcentaje']) + 5) # Dar espacio para el texto
-plt.show()
-
-# Pregunta 2
-# Términos técnicos a buscar (en minúsculas para coincidir)
-terminos_tecnicos = {
-    'llm': 'LLM', 
-    'rag': 'RAG', 
-    'agents': 'Agents/Agentes', 
-    'gpu': 'GPU/Chips', 
-    'transformer': 'Transformer',
-    'parameters': 'Parámetros',
-    'training': 'Training'
+percentages = {
+    company: round((count/total_news)*100, 2) for company, count in companies_count.items() if count > 0
 }
 
-conteo_tech = {label: 0 for label in terminos_tecnicos.values()}
+ordered_percentages = sorted(percentages.items(), key=lambda x: x[1], reverse=True)
 
-# Buscamos en los títulos
-for titulo in df['Titulo_Lower']:
-    for term, label in terminos_tecnicos.items():
-        # Usamos 'search' con bordes de palabra para evitar falsos positivos 
-        # (ej: que no cuente "program" como "rag")
-        if f" {term} " in f" {titulo} " or f"{term}," in titulo: 
-            conteo_tech[label] += 1
+df_1 = pd.DataFrame(ordered_percentages, columns=['Company', 'Percentage'])
 
-# DataFrame
-df_tech = pd.DataFrame(list(conteo_tech.items()), columns=['Término', 'Frecuencia'])
-df_tech = df_tech.sort_values('Frecuencia', ascending=False)
+sns.barplot(x='Percentage', y='Company', hue='Company', data=df_1)
+plt.title('% de Titulares que mencionan empresas líderes')
+plt.xlabel('% de Titulares')
+plt.ylabel('Empresa')
+plt.show()
 
-# --- GRÁFICO DE BARRAS VERTICAL ---
-plt.figure(figsize=(10, 6))
-sns.barplot(data=df_tech, x='Término', y='Frecuencia', palette='viridis')
+# PREGUNTA 2
+# ¿Cuál es la frecuencia de términos técnicos específicos (LLM, RAG, Agents, GPU y otros) en el texto completo de las noticias para medir el nivel de tecnificación del lenguaje?
 
-plt.title('Nivel de Especialización: Frecuencia de Términos Técnicos en Titulares', fontsize=14)
+# Para contestar esta pregunta, se buscarán los términos técnicos específicos en el texto completo de las noticias y se contarán las apariciones individuales de cada uno, similar al método utilizado en la pregunta 1.
+# Luego, se utilizará un diccionario de nivel cognitivo para clasificar la noticia en función de la complejidad del lenguaje utilizado.
+
+target_terms = {
+    "LLM": [
+        "llm",
+        "large language model",
+        "slm",
+        "small language model"
+    ],
+    "RAG": [
+        "rag",
+        "retrieval-augmented generation",
+        "graphrag"
+    ],
+    "AI Agent": [
+        "ai agent",
+        "autonomous agent",
+        "agentic workflow",
+        "agentic ai",
+        "multi-agent system"
+    ],
+    "Hardware Acceleration": [
+        "gpu",
+        "tpu",
+        "npu",
+        "lpu",
+        "tensor processing unit",
+        "neural processing unit",
+        "h100",
+        "a100",
+        "blackwell",
+        "gb200",
+        "cuda",
+        "tensor core"
+    ],
+    "Compute": [
+        "compute cluster",
+        "high performance computing",
+        "hpc",
+        "flops",
+        "petaflops",
+        "exaflops"
+    ],
+    "Transformer Architecture": [
+        "transformer architecture",
+        "transformer model",
+        "attention mechanism",
+        "self-attention",
+        "multi-head attention",
+        "flashattention"
+    ],
+    "MoE": [
+        "moe",
+        "mixture of expert",
+        "sparse moe",
+        "active parameter"
+    ],
+    "Reinforcement Learning": [
+        "rlhf",
+        "reinforcement learning from human feedback",
+        "rlaif",
+        "reward model",
+        "ppo",
+        "dpo"
+    ],
+    "Fine-Tuning": [
+        "sft",
+        "supervised fine-tuning",
+        "peft",
+        "parameter-efficient fine-tuning",
+        "instruction tuning",
+        "full fine-tuning"
+    ],
+    "LoRA": [
+        "lora",
+        "low-rank adaptation",
+        "qlora",
+        "dora"
+    ],
+    "Quantization": [
+        "quantization",
+        "quantized",
+        "weight quantization",
+        "fp8",
+        "fp16",
+        "int8",
+        "4-bit"
+    ],
+    "Prompt Engineering Techniques": [
+        "cot",
+        "chain of thought",
+        "chain-of-thought",
+        "in-context learning",
+        "few-shot learning",
+        "zero-shot learning"
+    ],
+    "Generative Methods": [
+        "diffusion model",
+        "latent diffusion",
+        "ldm",
+        "autoregressive",
+        "gan",
+        "generative adversarial network"
+    ],
+    "Model Behavior Issues": [
+        "ai hallucination",
+        "model hallucination",
+        "catastrophic forgetting",
+        "model collapse",
+        "mode collapse"
+    ],
+    "Alignment": [
+        "ai alignment",
+        "superalignment",
+        "constitutional ai",
+        "automated interpretability",
+        "mechanistic interpretability"
+    ],
+    "Multimodality": [
+        "multimodal",
+        "multimodality",
+        "lmm",
+        "large multimodal model",
+        "vlm",
+        "vision language model"
+    ],
+    "Vector Technology": [
+        "vector database",
+        "vector db",
+        "vector search",
+        "dense retrieval",
+        "semantic search"
+    ],
+    "Inference": [
+        "inference time",
+        "inference cost",
+        "inference speed",
+        "model inference",
+        "real-time inference"
+    ],
+    "Performance Metrics": [
+        "tokens per second",
+        "tps",
+        "time to first token",
+        "ttft",
+        "latency",
+        "throughput"
+    ],
+    "Training Process": [
+        "pre-training",
+        "pretraining",
+        "backpropagation",
+        "gradient descent",
+        "checkpointing",
+        "loss function"
+    ],
+    "Foundation Models": [
+        "foundation model",
+        "frontier model",
+        "open weight",
+        "state-of-the-art model",
+        "sota model"
+    ],
+    "Model Components": [
+        "embedding",
+        "hyperparameter",
+        "model weight",
+        "parameter count",
+        "context window",
+        "context length",
+        "kv cache",
+        "logits"
+    ],
+    "AGI Concepts": [
+        "artificial general intelligence",
+        "agi",
+        "artificial superintelligence",
+        "asi",
+        "technological singularity"
+    ]
+}
+
+terms_count = {term: 0 for term in target_terms.keys()}
+
+cognitive_levels = {
+    1: [
+        "AGI Concepts",
+        "Alignment",
+        "Model Behavior Issues",
+        "Foundation Models",
+        "Generative Methods",
+        "Multimodality",
+        "AI Agent"
+    ],
+    2: [
+        "LLM",
+        "RAG",
+        "Transformer Architecture",
+        "MoE",
+        "Reinforcement Learning",
+        "Prompt Engineering Techniques",
+        "Vector Technology",
+        "Model Components"
+    ],
+    3: [
+        "Fine-Tuning",
+        "LoRA",
+        "Quantization",
+        "Inference",
+        "Training Process",
+        "Performance Metrics",
+        "Hardware Acceleration",
+        "Compute"
+    ]
+}
+
+for text in df['f_content']:
+    for term, labels in target_terms.items():
+        if any(label in text for label in labels):
+            terms_count[term] += 1
+
+technification_level = {level: 0 for level in cognitive_levels.keys()}
+
+for term, count in terms_count.items():
+    for level, terms in cognitive_levels.items():
+        if term in terms:
+            technification_level[level] += count
+
+technification_ratio = technification_level[3] / (technification_level[1] + technification_level[2])
+
+df_2 = pd.DataFrame(list(technification_level.items()), columns = ['Level', 'Count'])
+
+ax = sns.barplot(data=df_2, x='Level', y='Count', hue='Level')
+
+plt.title('Frecuencia de Términos Técnicos en Titulares', fontsize=14)
 plt.ylabel('Número de Noticias', fontsize=12)
-plt.xlabel('Término Técnico', fontsize=12)
+plt.xlabel('Nivel de Especialización', fontsize=12)
+plt.xticks([0, 1, 2], ["Divulgativos", "Conceptuales", "Técnicos"])
+ax.legend().remove()
 plt.show()
 
-# Pregunta 3
-# Definir palabras clave por categoría
-keywords = {
-    'Generativa (Texto/Img)': ['generative', 'chatgpt', 'image', 'video', 'midjourney', 'dall-e', 'prompt'],
-    'Robótica/Hardware': ['robot', 'humanoid', 'hardware', 'chip', 'nvidia', 'gpu', 'device'],
-    'Ética/Legal': ['lawsuit', 'copyright', 'bias', 'safety', 'regulation', 'risk', 'security', 'deepfake'],
-    'Negocios/Inversión': ['funding', 'startup', 'valuation', 'acquisition', 'ipo', 'round']
+# PREGUNTA 3
+# ¿Qué subcategorías de IA (Generativa, Robótica, Ética) predominan en los registros almacenados?
+
+# Para contestar esta pregunta, se buscarán los términos técnicos específicos en el texto completo de las noticias y se contarán las apariciones individuales de cada uno, similar al método utilizado en la pregunta 1.
+
+target_categories = {
+    "Generative AI & LLMs": [
+        "generative AI", "Generative Artificial Intelligence", "GenAI", 
+        "large language model", "LLM", "LLMs", "chatbot", "chatbots", 
+        "text generation", "image generation", "video generation", 
+        "ChatGPT", "Claude", "Gemini", "Llama", "foundation model", 
+        "transformers", "prompt engineering", "GPT"
+    ],
+    "Computer Vision": [
+        "computer vision", "machine vision", "image recognition", 
+        "facial recognition", "face recognition", "object detection", 
+        "image classification", "video analysis", "visual perception", 
+        "OCR", "optical character recognition"
+    ],
+    "Machine Learning & Data Science": [
+        "machine learning", "deep learning", "neural network", "neural networks", 
+        "predictive modeling", "predictive analytics", "algorithm", "algorithms", 
+        "training data", "data labeling", "reinforcement learning", 
+        "supervised learning", "unsupervised learning", "pattern recognition"
+    ],
+    "Robotics & Automation": [
+        "robotics", "robot", "robots", "autonomous robot", "humanoid", 
+        "humanoid robot", "drone", "drones", "automation", "robotic process automation", 
+        "RPA", "industrial robot", "cobot", "collaborative robot"
+    ],
+    "Autonomous Vehicles": [
+        "autonomous vehicle", "self-driving car", "driverless car", 
+        "autonomous driving", "robotaxi", "automated driving system", 
+        "ADAS", "lidar", "autonomous truck", "Waymo", "Tesla FSD", "Cruise"
+    ],
+    "Ethics, Safety & Regulation": [
+        "AI ethics", "ethical AI", "AI safety", "AI alignment", 
+        "AI regulation", "AI governance", "AI policy", "bias", "fairness", 
+        "hallucination", "deepfake", "deepfakes", "misinformation", 
+        "copyright", "intellectual property", "EU AI Act", "responsible AI", 
+        "job displacement", "existential risk"
+    ],
+    "Hardware & Infrastructure": [
+        "GPU", "GPUs", "AI chip", "AI chips", "accelerator", 
+        "TPU", "NPU", "data center", "supercomputer", "computing power", 
+        "compute", "NVIDIA", "AMD", "Intel", "semiconductor"
+    ],
+    "Healthcare & Biotech": [
+        "AI in healthcare", "medical AI", "drug discovery", "precision medicine", 
+        "medical imaging", "diagnosis", "genomics", "protein folding", 
+        "AlphaFold", "clinical trial"
+    ],
+    "Enterprise & Business Applications": [
+        "AI adoption", "enterprise AI", "business intelligence", 
+        "customer service AI", "virtual assistant", "productivity tool", 
+        "fintech", "algorithmic trading", "fraud detection", "marketing automation"
+    ]
 }
 
-# Función para clasificar una noticia
-def clasificar_noticia(texto):
-    for categoria, palabras in keywords.items():
-        for palabra in palabras:
-            if palabra in texto:
-                return categoria
-    return 'Otros/General'
+categories_count = {category: 0 for category in target_categories.keys()}
 
-# Combinamos Título y Contenido para mejor contexto
-df['Texto_Completo'] = df['Titulo_Lower'] + " " + df['Contenido_Lower']
-df['Categoria'] = df['Texto_Completo'].apply(clasificar_noticia)
+for text in df['f_content']:
+    for category, labels in target_categories.items():
+        if any(label.lower() in text for label in labels):
+            categories_count[category] += 1
 
-# Contar categorías
-conteo_categorias = df['Categoria'].value_counts()
+percentages_2 = {
+    category: round((count/total_news)*100, 2) for category, count in categories_count.items() if count > 0
+}
 
-# --- GRÁFICO DE PASTEL (PIE CHART) ---
-plt.figure(figsize=(8, 8))
-plt.pie(conteo_categorias, labels=conteo_categorias.index, autopct='%1.1f%%', 
-        startangle=140, colors=sns.color_palette('pastel'), explode=[0.05]*len(conteo_categorias))
+ordered_percentages_2 = sorted(percentages_2.items(), key=lambda x: x[1], reverse=True)
 
-plt.title('Distribución de Temas: ¿De qué se habla en IA?', fontsize=16)
+df_3 = pd.DataFrame(ordered_percentages_2, columns=['Category', 'Percentage'])
+
+sns.barplot(x='Percentage', y='Category', hue='Category', data=df_3)
+plt.subplots_adjust(left=0.22)
+plt.title('Categorías de Noticias')
+plt.xlabel('% de Noticias')
+plt.ylabel('Categoría')
+plt.yticks(['Generative AI & LLMs', 'Computer Vision', 'Machine Learning & Data Science', 'Robotics & Automation', 'Autonomous Vehicles', 'Ethics, Safety & Regulation', 'Hardware & Infrastructure', 'Healthcare & Biotech', 'Enterprise & Business Applications'], ['IA Generativa', 'Visión por Computadora', 'ML & Datos', 'Robótica', 'Vehículos Autónomos', 'Ética y Regulación', 'Hardware', 'Salud & Biotecnología', 'IA Empresarial'])
 plt.show()
