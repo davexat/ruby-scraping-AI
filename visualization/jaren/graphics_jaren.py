@@ -6,13 +6,16 @@ import nltk
 from nltk.corpus import stopwords
 from collections import Counter
 import re
+import os
 
 # Descargar recursos necesarios de NLTK (solo la primera vez)
 nltk.download('stopwords')
 nltk.download('punkt')
 
 # 1. Cargar el CSV
-df = pd.read_csv('../../data/pazmino.csv')
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, '../../data/pazmino.csv')
+df = pd.read_csv(csv_path)
 
 # Limpieza básica: Eliminar filas vacías si falló el scraping
 df.dropna(subset=['Titulo', 'Contenido Completo'], inplace=True)
@@ -34,7 +37,6 @@ df['Sentimiento_Titulo'] = df['Titulo'].apply(analizar_sentimiento)
 df['Sentimiento_Contenido'] = df['Contenido Completo'].apply(analizar_sentimiento)
 
 # Crear el Gráfico
-plt.figure(figsize=(10, 6))
 sns.scatterplot(data=df, x='Sentimiento_Contenido', y='Sentimiento_Titulo', 
                 color='crimson', alpha=0.6, s=100)
 
@@ -45,13 +47,13 @@ plt.axvline(0, color='gray', linestyle='--', linewidth=0.8)
 # Línea de identidad (x=y) para ver la concordancia perfecta
 plt.plot([-1, 1], [-1, 1], color='blue', linestyle='--', label='Concordancia Perfecta')
 
-plt.title('Discrepancia Emocional: Título vs. Contenido', fontsize=16)
+plt.title('Discrepancia Emocional: Título vs. Contenido', fontsize=16, fontweight='bold')
 plt.xlabel('Sentimiento del Contenido (Cuerpo de la noticia)', fontsize=12)
 plt.ylabel('Sentimiento del Título (El Hook)', fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
-plt.show()
-plt.savefig('question1.png')
+plt.savefig(os.path.join(script_dir, 'question1.png'))
+plt.clf()
 
 # Pregunta 2
 from nltk.util import ngrams
@@ -84,16 +86,15 @@ etiquetas = [" ".join(bg[0]) for bg in common_bigrams]
 valores = [bg[1] for bg in common_bigrams]
 
 # Crear Gráfico de Barras Horizontal
-plt.figure(figsize=(14, 10))
 sns.barplot(x=valores, y=etiquetas, palette='viridis')
 
-plt.title('Tendencias de Adopción: Conceptos más Frecuentes (Bigramas)', fontsize=16)
+plt.subplots_adjust(left=0.17)
+plt.title('Tendencias de Adopción: Conceptos más Frecuentes (Bigramas)', fontsize=16, fontweight='bold')
 plt.xlabel('Frecuencia de Aparición', fontsize=12)
 plt.ylabel('Concepto / Término', fontsize=12)
-plt.show()
-plt.savefig('question2.png')
+plt.savefig(os.path.join(script_dir, 'question2.png'))
+plt.clf()
 
-# Pregunta 3
 # Pregunta 3
 # Lista de actores a rastrear
 actores = {
@@ -121,10 +122,9 @@ df_actores = pd.DataFrame(list(actores.items()), columns=['Actor', 'Menciones'])
 df_actores = df_actores.sort_values(by='Menciones', ascending=False)
 
 # Crear Gráfico de Barras
-plt.figure(figsize=(10, 6))
 grafico = sns.barplot(data=df_actores, x='Actor', y='Menciones', palette='magma')
 
-plt.title('Dominio Mediático: Empresas y Actores más Mencionados', fontsize=16)
+plt.title('Dominio Mediático: Empresas y Actores más Mencionados', fontsize=16, fontweight='bold')
 plt.xlabel('Actor / Empresa', fontsize=12)
 plt.ylabel('Total de Menciones', fontsize=12)
 
@@ -136,5 +136,5 @@ for p in grafico.patches:
                      xytext = (0, 9), 
                      textcoords = 'offset points')
 
-plt.show()
-plt.savefig('question3.png')
+plt.savefig(os.path.join(script_dir, 'question3.png'))
+plt.clf()

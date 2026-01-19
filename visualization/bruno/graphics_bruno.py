@@ -33,7 +33,6 @@ plt.rcParams['figure.figsize'] = (10, 6)
 # GRÁFICO 1: PIE CHART
 # Pregunta: ¿Cuánto domina la IA la conversación?
 # ==============================================================================
-plt.figure(figsize=(8, 8))
 conteo = df['Relevancia'].value_counts()
 colores = {'ALTA (IA)': '#ff6b6b', 'General Tech': '#4ecdc4'}
 
@@ -43,12 +42,12 @@ plt.pie(conteo, labels=conteo.index, autopct='%1.1f%%',
 plt.title('Distribución de Noticias: IA vs Tecnología General', fontsize=16, fontweight='bold')
 plt.tight_layout()
 plt.savefig(os.path.join(script_dir, 'question1.png'))
+plt.clf()
 
 # ==============================================================================
 # GRÁFICO 2: BARRAS DE IMPACTO PROMEDIO
 # Pregunta: ¿La IA genera más engagement (puntos/comentarios) promedio?
 # ==============================================================================
-plt.figure(figsize=(10, 6))
 
 promedios = df.groupby('Relevancia')[['Puntos', 'Comentarios']].mean().reset_index()
 
@@ -70,12 +69,12 @@ for container in ax.containers:
 
 plt.tight_layout()
 plt.savefig(os.path.join(script_dir, 'question2.png'))
+plt.clf()
 
 # ==============================================================================
 # GRÁFICO 3: TOP FUENTES DE IA
 # Pregunta: ¿De dónde salen las noticias de IA?
 # ==============================================================================
-plt.figure(figsize=(10, 6))
 
 df_ia = df[df['Relevancia'] == 'ALTA (IA)'].copy()
 
@@ -89,3 +88,4 @@ plt.ylabel('Sitio Web', fontsize=12)
 
 plt.tight_layout()
 plt.savefig(os.path.join(script_dir, 'question3.png'))
+plt.clf()

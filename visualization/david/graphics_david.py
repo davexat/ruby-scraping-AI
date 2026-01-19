@@ -85,7 +85,6 @@ for container in ax.containers:
     ax.bar_label(container, labels=tmp_hue['Percentage'])
 
 plt.savefig(os.path.join(script_dir, 'question1.png'))
-plt.show()
 plt.clf()
 
 # PREGUNTA 2
@@ -337,7 +336,6 @@ for container in ax.containers:
 
 ax.legend().remove()
 plt.savefig(os.path.join(script_dir, 'question2.png'))
-plt.show()
 plt.clf()
 
 # PREGUNTA 3
@@ -427,5 +425,4 @@ for container in ax.containers:
     ax.bar_label(container, labels=tmp_hue['Percentage'])
 
 plt.savefig(os.path.join(script_dir, 'question3.png'))
-plt.show()
 plt.clf()
