@@ -21,9 +21,9 @@ class Scraper
     end
 
     def extract()
-        print "Ingrese la cantidad de páginas a extraer (1-3): "
+        print "Ingrese la cantidad de páginas a extraer (1-10): "
         pages = gets.chomp.to_i
-        pages = ((pages > 0) and (pages < 4)) ? pages : 1
+        pages = ((pages > 0) and (pages < 11)) ? pages : 1
 
         filename = 'data/sandoval.csv'
 
