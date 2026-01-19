@@ -12,7 +12,7 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 # 1. Cargar el CSV
-df = pd.read_csv('data\pazmino.csv')
+df = pd.read_csv('../../data/pazmino.csv')
 
 # Limpieza básica: Eliminar filas vacías si falló el scraping
 df.dropna(subset=['Titulo', 'Contenido Completo'], inplace=True)
@@ -47,10 +47,11 @@ plt.plot([-1, 1], [-1, 1], color='blue', linestyle='--', label='Concordancia Per
 
 plt.title('Discrepancia Emocional: Título vs. Contenido', fontsize=16)
 plt.xlabel('Sentimiento del Contenido (Cuerpo de la noticia)', fontsize=12)
-plt.ylabel('Sentimiento del Título (El Gancho)', fontsize=12)
+plt.ylabel('Sentimiento del Título (El Hook)', fontsize=12)
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.show()
+plt.savefig('question1.png')
 
 # Pregunta 2
 from nltk.util import ngrams
@@ -83,13 +84,14 @@ etiquetas = [" ".join(bg[0]) for bg in common_bigrams]
 valores = [bg[1] for bg in common_bigrams]
 
 # Crear Gráfico de Barras Horizontal
-plt.figure(figsize=(12, 8))
+plt.figure(figsize=(14, 10))
 sns.barplot(x=valores, y=etiquetas, palette='viridis')
 
 plt.title('Tendencias de Adopción: Conceptos más Frecuentes (Bigramas)', fontsize=16)
 plt.xlabel('Frecuencia de Aparición', fontsize=12)
 plt.ylabel('Concepto / Término', fontsize=12)
 plt.show()
+plt.savefig('question2.png')
 
 # Pregunta 3
 # Pregunta 3
@@ -135,3 +137,4 @@ for p in grafico.patches:
                      textcoords = 'offset points')
 
 plt.show()
+plt.savefig('question3.png')

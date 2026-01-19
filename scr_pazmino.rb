@@ -65,7 +65,7 @@ begin
     end
   end
 
-  puts "\nFin del Scraping. Guardado en 'jaren.csv'."
+  puts "\nFin del Scraping. Guardado en 'pazmino.csv'."
 rescue OpenURI::HTTPError => e
   puts "Error fatal al abrir la portada: #{e.message}"
 end

@@ -40,7 +40,7 @@ plt.pie(conteo, labels=conteo.index, autopct='%1.1f%%',
 
 plt.title('Distribución de Noticias: IA vs Tecnología General', fontsize=16, fontweight='bold')
 plt.tight_layout()
-plt.savefig('grafico_1_pie_chart.png')
+plt.savefig('question1.png')
 #print("Gráfico 1 generado")
 
 # ==============================================================================
@@ -67,7 +67,7 @@ for p in plt.gca().patches:
                        textcoords = 'offset points', fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('grafico_2_barras_impacto.png')
+plt.savefig('question2.png')
 #print("Gráfico 2 generado")
 
 # ==============================================================================
@@ -87,5 +87,5 @@ plt.xlabel('Cantidad de Noticias', fontsize=12)
 plt.ylabel('Sitio Web', fontsize=12)
 
 plt.tight_layout()
-plt.savefig('grafico_3_top_fuentes.png')
+plt.savefig('question3.png')
 #print("Gráfico 3 generado")

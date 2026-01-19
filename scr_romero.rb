@@ -80,7 +80,7 @@ class Extractor
       end
     end
 
-    puts "\n🎉 ¡Scraping Finalizado con éxito!"
+    puts "\nScraping Finalizado con éxito."
   end
 end
 
