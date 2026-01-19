@@ -8,7 +8,7 @@ class Extractor
     @headers = {
       "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
     }
-    @nombre_archivo = "Romero_" + Time.now.strftime("%Y-%m-%d") + ".csv"
+    @nombre_archivo = "data/romero.csv"
   end
 
   def iniciar_archivo

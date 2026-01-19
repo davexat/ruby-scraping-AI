@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re
 
-archivo = '../../data/Romero.csv' 
+archivo = '../../data/romero.csv' 
 print(f"Cargando datos desde: {archivo}")
 
 try:

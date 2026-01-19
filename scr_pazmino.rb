@@ -20,7 +20,7 @@ begin
   articulos = doc.css('article')
   puts "Se encontraron #{articulos.count} noticias. Comenzando extracción..."
 
-  CSV.open('noticias_ars_openuri.csv', 'wb') do |csv|
+  CSV.open('data/pazmino.csv', 'wb') do |csv|
     csv << ['Titulo', 'Link', 'Contenido Completo']
 
     articulos.each_with_index do |articulo, index|

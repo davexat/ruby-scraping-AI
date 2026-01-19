@@ -12,7 +12,7 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 # 1. Cargar el CSV
-df = pd.read_csv('data\Pazmino.csv')
+df = pd.read_csv('data\pazmino.csv')
 
 # Limpieza básica: Eliminar filas vacías si falló el scraping
 df.dropna(subset=['Titulo', 'Contenido Completo'], inplace=True)
