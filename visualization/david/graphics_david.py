@@ -323,18 +323,12 @@ technification_ratio = technification_level[3] / (technification_level[1] + tech
 
 df_2 = pd.DataFrame(list(technification_level.items()), columns = ['Level', 'Count'])
 
-ax = sns.barplot(data=df_2, x='Level', y='Count', hue='Level', palette='flare')
-
-plt.title('Frecuencia de Términos Técnicos en Noticias', fontsize=16, fontweight='bold')
-plt.ylabel('Número de Noticias', fontsize=12)
-plt.xlabel('Nivel de Especialización', fontsize=12)
-plt.xticks([0, 1, 2], ["Divulgativos", "Conceptuales", "Técnicos"])
-
-for container in ax.containers:
-    tmp_hue = df_2.loc[df_2['Level']==container.get_label()]
-    ax.bar_label(container, labels=tmp_hue['Count'])
-
-ax.legend().remove()
+labels = ["Divulgativos", "Conceptuales", "Técnicos"]
+sizes = [technification_level[1], technification_level[2], technification_level[3]]
+colors = sns.color_palette('flare', len(labels))
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, colors=colors, textprops={'fontsize': 12})
+plt.title('Distribución de Niveles de Especialización Técnica', fontsize=16, fontweight='bold')
+plt.axis('equal')
 plt.savefig(os.path.join(script_dir, 'question2.png'))
 plt.clf()
 
@@ -412,17 +406,18 @@ ordered_percentages_2 = sorted(percentages_2.items(), key=lambda x: x[1], revers
 
 df_3 = pd.DataFrame(ordered_percentages_2, columns=['Category', 'Percentage'])
 
-ax = sns.barplot(x='Percentage', y='Category', hue='Category', data=df_3)
-
-plt.subplots_adjust(left=0.22)
-plt.title('Categorías de Noticias', fontsize=16, fontweight='bold')
-plt.xlabel('% de Noticias')
+# Usar gráfico de violín para mostrar la distribución de porcentajes por categoría
+plt.figure(figsize=(12, 7))
+data = []
+categories = []
+for cat, pct in ordered_percentages_2:
+    # Repetir la categoría según el porcentaje para simular la distribución
+    data.extend([cat] * int(pct))
+    categories.append(cat)
+sns.violinplot(y=data, inner=None, palette='pastel')
+plt.title('Distribución de Categorías de Noticias de IA', fontsize=16, fontweight='bold')
 plt.ylabel('Categoría')
-plt.yticks(['Generative AI & LLMs', 'Computer Vision', 'Machine Learning & Data Science', 'Robotics & Automation', 'Autonomous Vehicles', 'Ethics, Safety & Regulation', 'Hardware & Infrastructure', 'Healthcare & Biotech', 'Enterprise & Business Applications'], ['IA Generativa', 'Visión por Computadora', 'ML & Datos', 'Robótica', 'Vehículos Autónomos', 'Ética y Regulación', 'Hardware', 'Salud & Biotecnología', 'IA Empresarial'])
-
-for container in ax.containers:
-    tmp_hue = df_3.loc[df_3['Category']==container.get_label()]
-    ax.bar_label(container, labels=tmp_hue['Percentage'])
-
+plt.xlabel('Densidad de Noticias (%)')
+plt.tight_layout()
 plt.savefig(os.path.join(script_dir, 'question3.png'))
 plt.clf()
